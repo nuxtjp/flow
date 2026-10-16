@@ -38,19 +38,20 @@ const GraphRenderer = (rendererProps: { graphSlots: Slots }) => {
     if (!current.signal.aborted) callback()
   }
   return createVNode(current.component, {
-  ...props.options,
-  id: flowId.value,
-  nodes: props.nodes,
-  edges: props.edges,
-  onInit: current.onInit,
-  'onUpdate:nodes': (nodes: Node<NodeData, NodeEvents, NodeType>[]) => forward(() => emit('update:nodes', nodes)),
-  'onUpdate:edges': (edges: Edge<EdgeData, EdgeEvents, EdgeType>[]) => forward(() => emit('update:edges', edges)),
-  onError: (error: VueFlowError) => forward(() => emit('error', error)),
-  onConnect: (connection: Connection) => forward(() => emit('connect', connection)),
-  onNodesChange: (changes: NodeChange[]) => forward(() => emit('nodesChange', changes)),
-  onEdgesChange: (changes: EdgeChange[]) => forward(() => emit('edgesChange', changes)),
+    ...props.options,
+    id: flowId.value,
+    nodes: props.nodes,
+    edges: props.edges,
+    onInit: current.onInit,
+    'onUpdate:nodes': (nodes: Node<NodeData, NodeEvents, NodeType>[]) => forward(() => emit('update:nodes', nodes)),
+    'onUpdate:edges': (edges: Edge<EdgeData, EdgeEvents, EdgeType>[]) => forward(() => emit('update:edges', edges)),
+    onError: (error: VueFlowError) => forward(() => emit('error', error)),
+    onConnect: (connection: Connection) => forward(() => emit('connect', connection)),
+    onNodesChange: (changes: NodeChange[]) => forward(() => emit('nodesChange', changes)),
+    onEdgesChange: (changes: EdgeChange[]) => forward(() => emit('edgesChange', changes)),
   }, rendererProps.graphSlots)
 }
+GraphRenderer.props = ['graphSlots']
 </script>
 
 <template>

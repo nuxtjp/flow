@@ -5,6 +5,7 @@ export default ts.config(
   { ignores: ['dist/**', '**/.nuxt/**', '**/.output/**', 'node_modules/**', 'coverage/**'] },
   ...ts.configs.recommended,
   ...vue.configs['flat/recommended'],
+  { files: ['test/**/*.test.ts'], rules: { 'vue/one-component-per-file': 'off' } },
   { files: ['**/*.vue'], languageOptions: { parserOptions: { parser: ts.parser } } },
   { rules: {
     '@typescript-eslint/no-explicit-any': 'error',

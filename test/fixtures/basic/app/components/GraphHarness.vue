@@ -45,20 +45,20 @@ const { explicitId, nodes, edges, options, optionState, changes, connects, error
         <template #fallback>
           <p>Graph is loading for {{ name }}</p>
         </template>
-        <template
-          v-if="customSlot"
-          #node-custom="{ data }"
-        >
+        <template #node-custom="{ data }">
           <span class="node-label">{{ data.label }}</span>
         </template>
+        <template #node-group>
+          <span>Group</span>
+        </template>
         <template
           v-if="customSlot"
-          #node-group
+          #default
         >
-          <span class="conditional-slot">Conditional group slot</span>
-        </template>
-        <template #default>
-          <span data-testid="graph-slot">Graph slot rendered</span>
+          <span
+            class="conditional-slot"
+            data-testid="graph-slot"
+          >Graph slot rendered</span>
         </template>
       </NuxtFlow>
     </div>

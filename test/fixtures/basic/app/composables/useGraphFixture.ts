@@ -7,7 +7,7 @@ export function useGraphFixture(controlled: boolean) {
   const registry = useFixtureSessions()
   const session = shallowRef<FlowSession>()
   const explicitId = ref<string>()
-  const nodes = ref<Node[]>([
+  const nodes = ref<Node<{ label?: string }, Record<never, never>>[]>([
     { id: 'start', position: { x: 40, y: 40 }, data: { label: 'Start' } },
     { id: 'end', position: { x: 340, y: 40 }, data: { label: 'End' } },
     { id: 'group', type: 'group', position: { x: 40, y: 170 }, data: {},
@@ -15,7 +15,7 @@ export function useGraphFixture(controlled: boolean) {
     { id: 'child', parentNode: 'group', extent: 'parent', position: { x: 30, y: 30 },
       data: { label: 'Child' }, style: { width: '100px', height: '40px' } },
   ])
-  const edges = ref<Edge[]>([])
+  const edges = ref<Edge<Record<never, never>, Record<never, never>>[]>([])
   const changes = ref(0)
   const connects = ref(0)
   const errors = ref<string[]>([])
