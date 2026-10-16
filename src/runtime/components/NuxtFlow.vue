@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="NodeData = Record<string, unknown>, EdgeData = Record<string, unknown>, NodeEvents extends Record<string, CustomEvent> = Record<never, never>, EdgeEvents extends Record<string, CustomEvent> = Record<never, never>, NodeType extends string = string, EdgeType extends string = string">
-import type { Connection, CustomEvent, Edge, EdgeChange, FlowSlots, Node, NodeChange, VueFlowError } from '@vue-flow/core'
+import type { Connection, CustomEvent, Edge, EdgeChange, Node, NodeChange, VueFlowError } from '@vue-flow/core'
 import { computed, createVNode, useId } from 'vue'
-import type { Slots, VNode } from 'vue'
+import type { Slots } from 'vue'
 import { useCanvas } from '../composables/useCanvas'
-import type { FlowOptions, FlowSession } from '../types'
+import type { FlowOptions, FlowSession, NuxtFlowSlots } from '../types'
 
 defineOptions({ inheritAttrs: false })
 const props = withDefaults(defineProps<{
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   nodesChange: [changes: NodeChange[]]
   edgesChange: [changes: EdgeChange[]]
 }>()
-const slots = defineSlots<Partial<FlowSlots> & { fallback?: () => VNode[] }>()
+const slots = defineSlots<NuxtFlowSlots<NodeData, EdgeData, NodeEvents, EdgeEvents, NodeType, EdgeType>>()
 const getGraphSlots = () => {
   const forwarded = { ...slots }
   delete forwarded.fallback

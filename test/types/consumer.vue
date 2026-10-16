@@ -20,6 +20,10 @@ const ordinary = ref<Node<Data, Record<never, never>>[]>([{
   <NuxtFlow
     v-model:nodes="nodes"
     v-model:edges="edges"
-  />
+  >
+    <template #node-custom="{ data }">
+      {{ data.label.toUpperCase() }}
+    </template>
+  </NuxtFlow>
   <NuxtFlow v-model:nodes="ordinary" />
 </template>
