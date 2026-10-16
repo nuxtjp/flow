@@ -1,0 +1,3 @@
+<template>
+  <GraphHarness />
+</template>
