@@ -84,5 +84,12 @@
   "bugs": {
     "url": "https://github.com/nuxtjp/flow/issues"
   },
-  "homepage": "https://github.com/nuxtjp/flow#readme"
+  "homepage": "https://github.com/nuxtjp/flow#readme",
+  "keywords": [
+    "nuxt",
+    "vue",
+    "vue-flow",
+    "flow-editor",
+    "typescript"
+  ]
 }
