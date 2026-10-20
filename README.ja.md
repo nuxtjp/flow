@@ -9,30 +9,22 @@
 コミュニティが保守する統合モジュールです。Nuxt の公式モジュールではなく、
 Nuxt および Vue Flow のチームによる承認・推奨を示すものではありません。
 
-## 開発状況とインストール
+## インストール
 
-現在はプレリリース開発段階です。以下はソースからローカルパッケージを作る
-手順であり、npm に公開済みであることを前提としていません。
-
-[ソース](https://github.com/nuxtjp/flow) を取得したディレクトリでビルドを行います。
+Nuxt アプリに公開済みのモジュールを追加します。
 
 ```sh
-npm ci
-npm run dev:prepare
-npm run check
-npm pack
+npm install @nuxtjp/flow
 ```
 
-Nuxt アプリに生成した `.tgz` ファイルをインストールします。
-パスは `npm pack` が表示した実際のファイル名に置き換えてください。
+対応する Node・Nuxt・Vue の範囲と Vue Flow の依存設定は
+[package.json](package.json) を参照してください。CI は宣言した互換範囲を検証し、
+Nuxt 3/4 のすべての版への対応を保証するものではありません。
+アプリ側の lockfile と Dependabot の方針に沿って依存を更新してください。
 
-```sh
-npm install /absolute/path/to/package.tgz
-```
-
-Node.js ≥ 22.12、Nuxt `~4.6.1`、Vue `~3.5.44` が必要です。
-Vue Flow Core は `1.48.2` に固定しています。[package.json](package.json) も確認してください。
-Nuxt 3/4 のすべてのバージョンへの互換性を示すものではありません。
+開発用のローカルアーカイブは `npm ci`、`npm run dev:prepare`、
+`npm run check`、`npm pack` で作成できます。正式な公開版は
+[npm](https://www.npmjs.com/package/@nuxtjp/flow) で確認できます。
 
 ## クイックスタート
 

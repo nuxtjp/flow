@@ -9,30 +9,22 @@ to Nuxt SSR and static generation.
 This is a community-maintained integration. It is not an official Nuxt
 module and is not endorsed by the Nuxt or Vue Flow teams.
 
-## Status and installation
+## Installation
 
-This project is in pre-release development. The instructions below build
-a local package and do not assume an npm release is available.
-
-From a [source checkout](https://github.com/nuxtjp/flow), build and pack it:
+Install the published module in your Nuxt application:
 
 ```sh
-npm ci
-npm run dev:prepare
-npm run check
-npm pack
+npm install @nuxtjp/flow
 ```
 
-In your Nuxt application, install the resulting `.tgz` file. Replace the
-example path with the actual filename printed by `npm pack`:
+See [package.json](package.json) for supported Node/Nuxt/Vue ranges and the
+Vue Flow dependency. CI tests the declared compatibility; this is not a promise
+of support for every Nuxt 3/4 release. Keep dependency updates under your
+application's lockfile and Dependabot policy.
 
-```sh
-npm install /absolute/path/to/package.tgz
-```
-
-Requires Node.js ≥ 22.12, Nuxt `~4.6.1`, and Vue `~3.5.44`.
-Vue Flow Core is pinned to `1.48.2`; see [package.json](package.json).
-These narrow ranges do not claim compatibility with every Nuxt 3/4 release.
+Contributors can build a local archive with `npm ci`, `npm run dev:prepare`,
+`npm run check`, and `npm pack`. Local archives are development artifacts;
+installable registry versions are listed on [npm](https://www.npmjs.com/package/@nuxtjp/flow).
 
 ## Quick start
 

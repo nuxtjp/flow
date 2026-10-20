@@ -1,6 +1,6 @@
 {
   "name": "@nuxtjp/flow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed, client-only Vue Flow integration for Nuxt with SSR-safe boundaries",
   "license": "MIT",
   "type": "module",
