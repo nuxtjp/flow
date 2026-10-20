@@ -19,3 +19,5 @@ approval policy. Verify registry archive bytes and consumer behavior after appro
 
 Sources: https://docs.npmjs.com/staged-publishing/ and
 https://docs.npmjs.com/cli/v11/commands/npm-trust/ .
+
+After npm owner approval, the owner-local daily or manual `Verify published npm stage notices` workflow checks exact public bytes, the accepted source run and npm Sigstore provenance before closing the matching bot notification. It never approves or publishes a package, and retains pending/changed/unverified notices. No central collector or credential is used. Bootstrap releases without npm OIDC provenance require explicit manual evidence; they are not automatically accepted by this verifier.

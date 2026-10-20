@@ -1,0 +1,10 @@
+The publication reconciliation helpers notice.mts, publication.mts,
+reconcile.mts and publication.test.mts adapt the verification design from:
+https://github.com/zixcel/zixcel-google/blob/485f49797a327496a26cc6829d30061e57e29e2d/.github/scripts/reconcile_stage.mts
+and its accompanying tests, licensed under Apache-2.0.
+
+Changes: Flow-specific notice parsing, split typed modules, explicit owner
+REST paths, private temporary verification caches and observe-only acceptance.
+These CI-only helpers use Apache-2.0; see LICENSE-APACHE-2.0.
+The published @nuxtjp/flow runtime remains MIT. These tools and their license
+are excluded from that npm runtime archive.
