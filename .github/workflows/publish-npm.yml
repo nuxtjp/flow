@@ -1,0 +1,118 @@
+name: Release npm from version tag
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: npm-release-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  release-policy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: {node-version: '24', package-manager-cache: false}
+      - run: node --experimental-strip-types --test tools/npm-release/binding.test.mts
+      - run: bash tools/npm-release/test-admission.sh
+  prepare:
+    if: github.event_name == 'push' && github.ref_type == 'tag' && github.event.repository.private == false
+    needs: release-policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions: {contents: read, actions: read}
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+      filename: ${{ steps.binding.outputs.filename }}
+      sha256: ${{ steps.binding.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: {node-version: '24', package-manager-cache: false}
+      - name: Admit successful Node 22/24 owner CI and exact version
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: bash tools/npm-release/admit.sh
+      - name: Build without publication identity and pack once
+        id: binding
+        env: {NUXT_TELEMETRY_DISABLED: '1'}
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm run dev:prepare
+          npm run prepack
+          git diff --exit-code
+          mkdir "$RUNNER_TEMP/npm-release"
+          npm pack --ignore-scripts --json --pack-destination "$RUNNER_TEMP/npm-release" > "$RUNNER_TEMP/npm-release/pack.json"
+          node --experimental-strip-types tools/npm-release/archive.mts pack "$RUNNER_TEMP/npm-release"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        id: upload
+        with:
+          name: npm-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/npm-release/
+          if-no-files-found: error
+          retention-days: 30
+  attest:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    permissions: {contents: read, id-token: write, attestations: write}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with: {artifact-ids: '${{ needs.prepare.outputs.artifact }}', merge-multiple: true, path: '${{ runner.temp }}/npm-release'}
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
+        with: {subject-path: '${{ runner.temp }}/npm-release/*.tgz'}
+  stage:
+    if: vars.REGISTRY_PUBLISH_ENABLED == 'true'
+    needs: [prepare, attest]
+    environment: npm-public
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {contents: read, id-token: write}
+    outputs:
+      stage-id: ${{ steps.stage.outputs.stage-id }}
+      notice: ${{ steps.notice.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false, ref: '${{ github.sha }}'}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: {node-version: '24', registry-url: 'https://registry.npmjs.org', package-manager-cache: false}
+      - run: npm install --global --ignore-scripts npm@12.2.0
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with: {artifact-ids: '${{ needs.prepare.outputs.artifact }}', merge-multiple: true, path: '${{ runner.temp }}/npm-release'}
+      - name: Stage the exact archive; never approve from CI
+        id: stage
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
+          DIGEST: ${{ needs.prepare.outputs.sha256 }}
+          ARCHIVE: ${{ needs.prepare.outputs.filename }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/npm-release"
+          [[ "$DIGEST" =~ ^[a-f0-9]{64}$ && "$ARCHIVE" =~ ^nuxtjp-flow-[0-9]+\.[0-9]+\.[0-9]+\.tgz$ ]]
+          printf '%s  %s\n' "$DIGEST" "$ARCHIVE" | sha256sum --check
+          npm stage publish "$ARCHIVE" --access public --provenance --ignore-scripts --json --registry=https://registry.npmjs.org/ > stage.json
+          cd "$GITHUB_WORKSPACE"
+          node --experimental-strip-types tools/npm-release/archive.mts stage "$RUNNER_TEMP/npm-release"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        id: notice
+        with: {name: 'stage-notice-${{ github.run_id }}-${{ github.run_attempt }}', path: '${{ runner.temp }}/npm-release/notice.md', if-no-files-found: error}
+  notify:
+    needs: stage
+    if: needs.stage.outputs.stage-id != ''
+    runs-on: ubuntu-24.04
+    permissions: {contents: read, issues: write}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with: {artifact-ids: '${{ needs.stage.outputs.notice }}', merge-multiple: true, path: '${{ runner.temp }}/notice'}
+      - env: {GH_TOKEN: '${{ github.token }}', STAGE: '${{ needs.stage.outputs.stage-id }}'}
+        run: |
+          set -euo pipefail
+          [[ "$STAGE" =~ ^[a-f0-9-]{36}$ ]]
+          count=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --search "$STAGE in:body" --json number --jq length)
+          if test "$count" = 0; then gh issue create --repo "$GITHUB_REPOSITORY" --title "[npm stage] Review $STAGE" --body-file "$RUNNER_TEMP/notice/notice.md"; fi
+          cat "$RUNNER_TEMP/notice/notice.md" >> "$GITHUB_STEP_SUMMARY"

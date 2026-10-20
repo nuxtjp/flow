@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "tools/npm-release/**/*.mts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test/fixtures"
+  ]
+}
