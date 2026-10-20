@@ -1,0 +1,6 @@
+{
+  "repository": "nuxtjp/flow",
+  "package": "@nuxtjp/flow",
+  "tag_prefix": "v",
+  "workflow": "ci.yml"
+}
