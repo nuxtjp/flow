@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with: {persist-credentials: false}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with: {node-version: '24', package-manager-cache: false}
+        with: {node-version: '24.22.1', package-manager-cache: false}
       - run: node --test tools/npm-release/publication.test.mts
   reconcile:
     needs: verify-source
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with: {persist-credentials: false, ref: '${{ github.event.repository.default_branch }}'}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with: {node-version: '24', package-manager-cache: false}
+        with: {node-version: '24.22.1', package-manager-cache: false}
       - run: npm install --global --ignore-scripts npm@12.2.0
       - env: {GH_TOKEN: '${{ github.token }}', NODE_AUTH_TOKEN: '', NPM_TOKEN: ''}
         run: node tools/npm-release/reconcile.mts
